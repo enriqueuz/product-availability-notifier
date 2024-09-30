@@ -7,6 +7,7 @@ import os
 
 load_dotenv()
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_SID = os.getenv('TWILIO_SID')
 
 def get_sms_body(iphone_searched, available_iphones):
     body = f'The {iphone_searched} is available in the following options: \n'
@@ -32,7 +33,7 @@ def check_iphone_available(iphone_searched):
 
 def notify_iphone_available(sms_body):
 
-    account_sid = 'AC4c0b78e96c77abe6de998801764c0dc9'
+    account_sid = TWILIO_SID
     auth_token = TWILIO_AUTH_TOKEN
     client = Client(account_sid, auth_token)
     message = client.messages.create(
