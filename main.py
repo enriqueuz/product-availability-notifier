@@ -15,11 +15,9 @@ def get_sms_body(iphone_searched, available_iphones):
         body += f'- {iphone}\n'
     return body
 
-def check_iphone_available(iphone_searched):
+def check_iphone_available(iphone_searched, driver):
     url = "https://www.apple.com/shop/refurbished/iphone/iphone-14-pro-max"
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    driver = webdriver.Chrome(options=options)
+
     driver.get(url)
     iphone_items = driver.find_elements(By.CLASS_NAME, 'rf-refurb-producttile')
     available_iphones = []
@@ -32,7 +30,6 @@ def check_iphone_available(iphone_searched):
     return available_iphones
 
 def notify_iphone_available(sms_body):
-
     account_sid = TWILIO_SID
     auth_token = TWILIO_AUTH_TOKEN
     client = Client(account_sid, auth_token)
@@ -48,7 +45,10 @@ def notify_iphone_available(sms_body):
 def main():
     while True:
         iphone_searched = 'iPhone 14 Pro Max 128GB'
-        available_iphones = check_iphone_available(iphone_searched)
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(options=options)
+        available_iphones = check_iphone_available(iphone_searched, driver)
             
         if available_iphones:
             print(f'The {iphone_searched} is available in the following options: ')
@@ -56,10 +56,12 @@ def main():
                 print(iphone)
             sms_body = get_sms_body(iphone_searched, available_iphones)
             notify_iphone_available(sms_body)
-            time.sleep(3600)
+            time.sleep(1800)
             
         else:
             print(f'The {iphone_searched} is not available')
+        
+        driver.quit()
         time.sleep(30)
     
             
