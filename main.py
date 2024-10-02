@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 import time
 from dotenv import load_dotenv
 import os
+import shutil
 
 load_dotenv()
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
@@ -45,7 +46,7 @@ def notify_iphone_available(sms_body):
 def main():
     while True:
         if os.path.isdir('custom_temp_dir'):
-            os.rmdir('custom_temp_dir')
+            shutil.rmtree('custom_temp_dir')
         
         iphone_searched = 'iPhone 14 Pro Max 128GB'
         options = webdriver.ChromeOptions()
