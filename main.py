@@ -44,9 +44,17 @@ def notify_iphone_available(sms_body):
 
 def main():
     while True:
+        if os.path.isdir('custom_temp_dir'):
+            os.rmdir('custom_temp_dir')
+        
         iphone_searched = 'iPhone 14 Pro Max 128GB'
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
+        options.add_argument("--remote-debugging-port=9222")
+        custom_temp_dir = os.path.join(os.getcwd(), "custom_temp_dir")
+        if not os.path.exists(custom_temp_dir):
+            os.makedirs(custom_temp_dir)
+        options.add_argument(f"--user-data-dir={custom_temp_dir}")
         driver = webdriver.Chrome(options=options)
         available_iphones = check_iphone_available(iphone_searched, driver)
             
