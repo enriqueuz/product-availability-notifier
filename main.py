@@ -6,9 +6,22 @@ from dotenv import load_dotenv
 import os
 import shutil
 
-load_dotenv()
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-TWILIO_SID = os.getenv('TWILIO_SID')
+
+def load_env_vars():
+    load_dotenv()
+    TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+    TWILIO_SID = os.getenv('TWILIO_SID')
+    IPHONE_SEARCHED = os.getenv('IPHONE_SEARCHED')
+    
+    if not TWILIO_AUTH_TOKEN or not TWILIO_SID or not IPHONE_SEARCHED:
+        raise Exception(
+            'Please provide the following environment variables: TWILIO_AUTH_TOKEN, TWILIO_SID, IPHONE_SEARCHED'
+        )
+    
+    return TWILIO_AUTH_TOKEN, TWILIO_SID, IPHONE_SEARCHED
+
+
+TWILIO_AUTH_TOKEN, TWILIO_SID, IPHONE_SEARCHED = load_env_vars()
 
 def get_sms_body(iphone_searched, available_iphones):
     body = f'The {iphone_searched} is available in the following options: \n'
@@ -34,6 +47,7 @@ def notify_iphone_available(sms_body):
     account_sid = TWILIO_SID
     auth_token = TWILIO_AUTH_TOKEN
     client = Client(account_sid, auth_token)
+    
     message = client.messages.create(
     messaging_service_sid='MGd43a853886bf48f4d911cdfb0dfbffc4',
     body=sms_body,
@@ -48,7 +62,6 @@ def main():
         if os.path.isdir('custom_temp_dir'):
             shutil.rmtree('custom_temp_dir')
         
-        iphone_searched = 'iPhone 14 Pro Max 128GB'
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
         options.add_argument("--remote-debugging-port=9222")
@@ -57,18 +70,18 @@ def main():
             os.makedirs(custom_temp_dir)
         options.add_argument(f"--user-data-dir={custom_temp_dir}")
         driver = webdriver.Chrome(options=options)
-        available_iphones = check_iphone_available(iphone_searched, driver)
+        available_iphones = check_iphone_available(IPHONE_SEARCHED, driver)
             
         if available_iphones:
-            print(f'The {iphone_searched} is available in the following options: ')
+            print(f'The {IPHONE_SEARCHED} is available in the following options: ')
             for iphone in available_iphones:
                 print(iphone)
-            sms_body = get_sms_body(iphone_searched, available_iphones)
+            sms_body = get_sms_body(IPHONE_SEARCHED, available_iphones)
             notify_iphone_available(sms_body)
             time.sleep(1800)
             
         else:
-            print(f'The {iphone_searched} is not available')
+            print(f'The {IPHONE_SEARCHED} is not available')
         
         driver.quit()
         time.sleep(30)
