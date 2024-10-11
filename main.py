@@ -5,6 +5,7 @@ import time
 from dotenv import load_dotenv
 import os
 import shutil
+import retrying
 
 
 def load_env_vars():
@@ -29,6 +30,7 @@ def get_sms_body(iphone_searched, available_iphones):
         body += f'- {iphone}\n'
     return body
 
+@retrying.retry(wait_random_min=1000, wait_random_max=10000)
 def check_iphone_available(iphone_searched, driver):
     url = "https://www.apple.com/shop/refurbished/iphone/iphone-14-pro-max"
 
